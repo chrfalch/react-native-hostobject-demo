@@ -14,7 +14,9 @@
 #import "Test.h"
 #import "TestBinding.h"
 
-@implementation AppDelegate
+@implementation AppDelegate {
+  bool _hostObjectsInstalled;
+}
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -48,6 +50,11 @@
 }
 
 - (void)handleJavaScriptDidLoadNotification:(__unused NSNotification*)notification {
+  
+  // Guard against installing the module multiple times
+  if(self->_hostObjectsInstalled) return;
+  self->_hostObjectsInstalled = true;
+  
   RCTCxxBridge* bridge = notification.userInfo[@"bridge"];
   facebook::jsi::Runtime* runtime = (facebook::jsi::Runtime*)bridge.runtime;
   auto test = std::make_unique<facebook::react::Test>();
